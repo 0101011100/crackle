@@ -1,0 +1,71 @@
+name: Check testing building linting
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ "**" ]
+
+jobs:
+  lint:
+    name: Run lint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Set up NodeJS LTS
+        uses: actions/setup-node@v7
+        with:
+          node-version: 'lts/*'
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Install pnpm
+        run: npm install -g pnpm
+      - name: Set pnpm store-dir path
+        run: mkdir -p ~/.pnpm-store && pnpm config set store-dir ~/.pnpm-store
+      - name: Install dependencies
+        run: pnpm install --no-lockfile
+      - name: Run lint
+        run: npm run lint
+  build:
+    name: Build the project
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Set up NodeJS LTS
+        uses: actions/setup-node@v7
+        with:
+          node-version: 'lts/*'
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Install pnpm
+        run: npm install -g pnpm
+      - name: Set pnpm store-dir path
+        run: mkdir -p ~/.pnpm-store && pnpm config set store-dir ~/.pnpm-store
+      - name: Install dependencies
+        run: pnpm install --no-lockfile
+      - name: Build the project
+        run: npm run build
+  test:
+    name: Run ava tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Set up NodeJS LTS
+        uses: actions/setup-node@v7
+        with:
+          node-version: 'lts/*'
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Install pnpm
+        run: npm install -g pnpm
+      - name: Set pnpm store-dir path
+        run: mkdir -p ~/.pnpm-store && pnpm config set store-dir ~/.pnpm-store
+      - name: Install dependencies
+        run: pnpm install --no-lockfile
+      - name: Run tests
+        run: npm run test

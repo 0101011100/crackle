@@ -1,0 +1,25 @@
+{
+  "name": "@filteringdev/crackle-builder",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint": "tsc --noEmit && oxlint --type-aware **/*.ts",
+    "build": "tsx source/buildci.ts",
+    "debug": "tsx source/debug.ts"
+  },
+  "dependencies": {
+    "@types/node": "^24.12.2"
+  },
+  "devDependencies": {
+    "@npmcli/package-json": "^8.0.0",
+    "@types/npmcli__package-json": "^4.0.4",
+    "@typescriptprime/parsing": "^2.0.1",
+    "chokidar": "^5.0.0",
+    "esbuild": "^0.28.0",
+    "oxlint": "^1.79.0",
+    "oxlint-tsgolint": "^7.0.2001",
+    "tsx": "^4.21.0",
+    "typescript": "^7.0.2",
+    "zod": "^4.4.3"
+  }
+}

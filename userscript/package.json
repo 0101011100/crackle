@@ -1,0 +1,17 @@
+{
+  "name": "@filteringdev/crackle-userscript",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint": "tsc --noEmit && oxlint --type-aware **/*.ts"
+  },
+  "devDependencies": {
+    "@types/web": "^0.0.349",
+    "@violentmonkey/types": "^0.3.3",
+    "oxlint": "^1.79.0",
+    "oxlint-tsgolint": "^7.0.2001"
+  },
+  "dependencies": {
+    "typescript": "^7.0.2"
+  }
+}

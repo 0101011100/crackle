@@ -1,0 +1,11 @@
+packages:
+  - "builder"
+  - "userscript"
+  - "testunit"
+
+allowBuilds:
+  esbuild: true
+
+minimumReleaseAge: 1440
+minimumReleaseAgeExclude:
+  - '@typescriptprime/*'

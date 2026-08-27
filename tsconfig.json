@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "module": "NodeNext",
+    "target": "ES2024",
+    "moduleResolution": "NodeNext",
+    "removeComments": false,
+    "skipLibCheck": true,
+    "paths": {
+      "@builder/*": [
+        "./builder/source/*"
+      ],
+      "@userscript/*": [
+        "./userscript/source/*"
+      ],
+      "@root/*": [
+        "./source/*"
+      ],
+      "@reporoot/*": [
+        "./*"
+      ]
+    }
+  }
+}
