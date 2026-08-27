@@ -15,7 +15,6 @@ export class StandardBuild extends Build {
   }
 
   async Build() {
-    // TODO: replace placeholder metadata and target domains once the userscript's actual site/purpose is decided
     const Banner = CreateBanner({
       Version: this.Options?.Version ?? (await PackageJson.load(this.ProjectRoot)).content.version ?? '0.0.0',
       BuildType: this.Options!.BuildType ?? 'production',
@@ -29,8 +28,8 @@ export class StandardBuild extends Build {
       License: 'MPL-2.0',
       Author: 'PiQuark6046 and contributors',
       Description: {
-        en: 'TODO: describe crackle',
-        ko: 'TODO: crackle에 대한 설명'
+        en: 'Advert removal and anti-adblock bypass script for Naver Chzzk web site',
+        ko: '네이버 치지직 웹 사이트에 대한 광고 제거 및 안티-애드블록 우회 스크립트'
       }
     })
 
