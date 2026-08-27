@@ -12,6 +12,7 @@
     "typeAware": true
   },
   "rules": {
+    "crackle/pascal-case": "error",
     "crackle/no-semicolons": "error",
     "crackle/single-quotes": "error"
   },
@@ -62,8 +63,7 @@
         "typescript/require-await": "warn",
         "typescript/restrict-plus-operands": "warn",
         "typescript/restrict-template-expressions": "warn",
-        "typescript/unbound-method": "warn",
-        "crackle/pascal-case": "error"
+        "typescript/unbound-method": "warn"
       }
     },
     {

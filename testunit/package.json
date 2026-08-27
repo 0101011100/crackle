@@ -29,6 +29,7 @@
     "ava": "^8.0.1",
     "oxlint": "^1.79.0",
     "oxlint-tsgolint": "^7.0.2001",
+    "playwright": "^1.62.1",
     "tsx": "^4.21.0",
     "typescript": "^7.0.2"
   }
