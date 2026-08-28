@@ -188,6 +188,53 @@ const Primitive = <Value>(Expected: string, Guard: (Input: unknown) => Input is 
 
 const LiteralLabel = (Value: Literal): string => JSON.stringify(Value)
 
+type ObjectMode = 'strip' | 'strict' | 'loose'
+
+const ObjectSchema = <SchemaShape extends Shape>(Shape: SchemaShape, Mode: ObjectMode) => {
+	return new SchemaDefinition<InferShape<SchemaShape>>((Input, Path) => {
+		if (!IsPlainRecord(Input)) {
+			return Fail(Path, 'Expected object', 'object', TypeName(Input))
+		}
+
+		const Data = {} as InferShape<SchemaShape>
+		const Issues: SchemaIssue[] = []
+
+		for (const Key of Object.keys(Shape) as Array<keyof SchemaShape & string>) {
+			const PropertyResult = Shape[Key].ParseAt(Input[Key], [...Path, Key])
+
+			if (PropertyResult.Success) {
+				Data[Key] = PropertyResult.Data as InferShape<SchemaShape>[typeof Key]
+			} else {
+				Issues.push(...PropertyResult.Issues)
+			}
+		}
+
+		for (const Key of Object.keys(Input)) {
+			if (Key in Shape) {
+				continue
+			}
+
+			if (Mode === 'strict') {
+				Issues.push({
+					Path: [...Path, Key],
+					Message: `Unrecognized key "${Key}"`
+				})
+			} else if (Mode === 'loose') {
+				;(Data as Record<string, unknown>)[Key] = Input[Key]
+			}
+		}
+
+		if (Issues.length > 0) {
+			return {
+				Success: false,
+				Issues
+			}
+		}
+
+		return Succeed(Data)
+	})
+}
+
 export const Schema = {
 	String: () => Primitive('string', (Input): Input is string => typeof Input === 'string'),
 	Number: () => Primitive('number', (Input): Input is number => typeof Input === 'number' && Number.isFinite(Input)),
@@ -242,35 +289,9 @@ export const Schema = {
 			return Succeed(Data)
 		})
 	},
-	Object: <SchemaShape extends Shape>(Shape: SchemaShape) => {
-		return new SchemaDefinition<InferShape<SchemaShape>>((Input, Path) => {
-			if (!IsPlainRecord(Input)) {
-				return Fail(Path, 'Expected object', 'object', TypeName(Input))
-			}
-
-			const Data = {} as InferShape<SchemaShape>
-			const Issues: SchemaIssue[] = []
-
-			for (const Key of Object.keys(Shape) as Array<keyof SchemaShape & string>) {
-				const PropertyResult = Shape[Key].ParseAt(Input[Key], [...Path, Key])
-
-				if (PropertyResult.Success) {
-					Data[Key] = PropertyResult.Data as InferShape<SchemaShape>[typeof Key]
-				} else {
-					Issues.push(...PropertyResult.Issues)
-				}
-			}
-
-			if (Issues.length > 0) {
-				return {
-					Success: false,
-					Issues
-				}
-			}
-
-			return Succeed(Data)
-		})
-	},
+	Object: <SchemaShape extends Shape>(Shape: SchemaShape) => ObjectSchema(Shape, 'strip'),
+	StrictObject: <SchemaShape extends Shape>(Shape: SchemaShape) => ObjectSchema(Shape, 'strict'),
+	LooseObject: <SchemaShape extends Shape>(Shape: SchemaShape) => ObjectSchema(Shape, 'loose'),
 	Union: <Options extends readonly [SchemaDefinition<unknown>, SchemaDefinition<unknown>, ...Array<SchemaDefinition<unknown>>]>(Options: Options) => {
 		return new SchemaDefinition<Infer<Options[number]>>((Input, Path) => {
 			const Issues: SchemaIssue[] = []

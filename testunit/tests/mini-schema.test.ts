@@ -57,6 +57,64 @@ Test('parses objects and strips unknown keys', T => {
 	})
 })
 
+Test('strict objects reject unknown keys', T => {
+	const UserSchema = Schema.StrictObject({
+		id: Schema.String()
+	})
+
+	const Result = UserSchema.SafeParse({
+		id: 'u-1',
+		extra: true
+	})
+
+	T.false(Result.Success)
+
+	if (!Result.Success) {
+		T.deepEqual(Result.Error.Issues, [{
+			Path: ['extra'],
+			Message: 'Unrecognized key "extra"'
+		}])
+	}
+})
+
+Test('strict object issues include nested unknown key paths', T => {
+	const UserSchema = Schema.StrictObject({
+		meta: Schema.StrictObject({
+			active: Schema.Boolean()
+		})
+	})
+
+	const Result = UserSchema.SafeParse({
+		meta: {
+			active: true,
+			extra: 'ignored'
+		}
+	})
+
+	T.false(Result.Success)
+
+	if (!Result.Success) {
+		T.deepEqual(Result.Error.Issues[0], {
+			Path: ['meta', 'extra'],
+			Message: 'Unrecognized key "extra"'
+		})
+	}
+})
+
+Test('loose objects preserve unknown keys', T => {
+	const UserSchema = Schema.LooseObject({
+		id: Schema.String()
+	})
+
+	T.deepEqual(UserSchema.Parse({
+		id: 'u-1',
+		extra: true
+	}), {
+		id: 'u-1',
+		extra: true
+	})
+})
+
 Test('reports nested object and array paths', T => {
 	const ConfigSchema = Schema.Object({
 		items: Schema.Array(Schema.Object({
