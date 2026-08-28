@@ -8,7 +8,15 @@ export function GFPScheduleBlock() {
     },
     'requestId': `vas-${crypto.randomUUID()}`,
     'videoAdScheduleId': 'LIVE_CHZZK_NDP_SCH',
-    'adBreaks': []
+    'adBreaks': [
+      {
+        'id': '',
+        'startDelay': 0,
+        'preFetch': 0,
+        'adUnitId': '',
+        'adSources': []
+      }
+    ]
   }
 }
 
