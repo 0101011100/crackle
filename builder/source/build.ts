@@ -18,7 +18,7 @@ export class StandardBuild extends Build {
     const Banner = CreateBanner({
       Version: this.Options?.Version ?? (await PackageJson.load(this.ProjectRoot)).content.version ?? '0.0.0',
       BuildType: this.Options!.BuildType ?? 'production',
-      Domains: new Set<string>(),
+      Domains: new Set<string>(['chzzk.naver.com']),
       Name: 'crackle',
       Namespace: 'https://github.com/FilteringDev/crackle',
       DownloadURL: this.Options!.SubscriptionUrl,
