@@ -1,4 +1,4 @@
-import Test from 'ava'
+import { test, expect } from 'vitest'
 
 import { GenerateHex, GenerateNumber } from '@userscript/random.js'
 
@@ -21,22 +21,22 @@ function WithGetRandomValues(MockGetRandomValues: (Bytes: Uint8Array) => Uint8Ar
 	}
 }
 
-Test('generates requested-length lowercase hex strings', T => {
+test('generates requested-length lowercase hex strings', () => {
 	for (let Length of [0, 1, 2, 15, 32]) {
 		let Result = GenerateHex(Length)
 
-		T.is(Result.length, Length)
-		T.regex(Result, /^[0-9a-f]*$/)
+		expect(Result.length).toBe(Length)
+		expect(Result).toMatch(/^[0-9a-f]*$/)
 	}
 })
 
-Test('rejects invalid lengths', T => {
+test('rejects invalid lengths', () => {
 	for (let Length of [-1, 1.5, Number.NaN, Number.MAX_SAFE_INTEGER + 1]) {
-		T.throws(() => GenerateHex(Length), { instanceOf: RangeError })
+		expect(() => GenerateHex(Length)).toThrow(RangeError)
 	}
 })
 
-Test('uses crypto getRandomValues for enough bytes', T => {
+test('uses crypto getRandomValues for enough bytes', () => {
 	let Called = false
 	let RequestedByteLength = 0
 
@@ -49,24 +49,24 @@ Test('uses crypto getRandomValues for enough bytes', T => {
 			return Bytes
 		},
 		() => {
-			T.is(GenerateHex(3), 'abc')
-			T.true(Called)
-			T.is(RequestedByteLength, 2)
+			expect(GenerateHex(3)).toBe('abc')
+			expect(Called).toBe(true)
+			expect(RequestedByteLength).toBe(2)
 		}
 	)
 })
 
-Test('generates numbers inside inclusive safe integer ranges', T => {
+test('generates numbers inside inclusive safe integer ranges', () => {
 	for (let Index = 0; Index < 32; Index += 1) {
 		let Result = GenerateNumber(-3, 7)
 
-		T.true(Number.isInteger(Result))
-		T.true(Result >= -3)
-		T.true(Result <= 7)
+		expect(Number.isInteger(Result)).toBe(true)
+		expect(Result >= -3).toBe(true)
+		expect(Result <= 7).toBe(true)
 	}
 })
 
-Test('returns fixed range values without random bytes', T => {
+test('returns fixed range values without random bytes', () => {
 	let Called = false
 
 	WithGetRandomValues(
@@ -75,13 +75,13 @@ Test('returns fixed range values without random bytes', T => {
 			return Bytes
 		},
 		() => {
-			T.is(GenerateNumber(42, 42), 42)
-			T.false(Called)
+			expect(GenerateNumber(42, 42)).toBe(42)
+			expect(Called).toBe(false)
 		}
 	)
 })
 
-Test('uses unbiased rejection sampling for generated numbers', T => {
+test('uses unbiased rejection sampling for generated numbers', () => {
 	let Calls = 0
 	let RequestedByteLength = 0
 
@@ -94,14 +94,14 @@ Test('uses unbiased rejection sampling for generated numbers', T => {
 			return Bytes
 		},
 		() => {
-			T.is(GenerateNumber(10, 19), 17)
-			T.is(Calls, 2)
-			T.is(RequestedByteLength, 1)
+			expect(GenerateNumber(10, 19)).toBe(17)
+			expect(Calls).toBe(2)
+			expect(RequestedByteLength).toBe(1)
 		}
 	)
 })
 
-Test('rejects invalid number ranges', T => {
+test('rejects invalid number ranges', () => {
 	for (let Range of [
 		[1.5, 2],
 		[1, 2.5],
@@ -110,6 +110,6 @@ Test('rejects invalid number ranges', T => {
 		[Number.MAX_SAFE_INTEGER + 1, Number.MAX_SAFE_INTEGER + 2],
 		[2, 1]
 	] as const) {
-		T.throws(() => GenerateNumber(Range[0], Range[1]), { instanceOf: RangeError })
+		expect(() => GenerateNumber(Range[0], Range[1])).toThrow(RangeError)
 	}
 })

@@ -4,33 +4,16 @@
   "type": "module",
   "scripts": {
     "lint": "tsc --noEmit && oxlint --type-aware **/*.ts",
-    "test": "ava"
-  },
-  "ava": {
-    "files": [
-      "tests/**/*.test.ts"
-    ],
-    "nodeArguments": [
-      "--import=tsx"
-    ],
-    "workerThreads": false,
-    "typescript": {
-      "rewritePaths": {
-        "@userscript/": "./sources/"
-      },
-      "compile": false
-    }
+    "test": "vitest run"
   },
   "devDependencies": {
-    "@ava/typescript": "^7.0.0",
     "@types/node": "^24.13.1",
     "@types/web": "^0.0.349",
     "@violentmonkey/types": "^0.3.3",
-    "ava": "^8.0.1",
     "oxlint": "^1.79.0",
     "oxlint-tsgolint": "^7.0.2001",
     "playwright": "^1.62.1",
-    "tsx": "^4.21.0",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "vitest": "^3.2.4"
   }
 }

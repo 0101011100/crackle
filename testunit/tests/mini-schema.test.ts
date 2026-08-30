@@ -1,22 +1,22 @@
-import Test from 'ava'
+import { test, expect } from 'vitest'
 
 import { Schema, SchemaError, type Infer } from '@userscript/mini-schema.js'
 
-Test('parses primitive values', T => {
-	T.is(Schema.String().Parse('crackle'), 'crackle')
-	T.is(Schema.Number().Parse(3), 3)
-	T.is(Schema.Boolean().Parse(false), false)
-	T.deepEqual(Schema.Unknown().Parse({ value: true }), { value: true })
+test('parses primitive values', () => {
+	expect(Schema.String().Parse('crackle')).toBe('crackle')
+	expect(Schema.Number().Parse(3)).toBe(3)
+	expect(Schema.Boolean().Parse(false)).toBe(false)
+	expect(Schema.Unknown().Parse({ value: true })).toEqual({ value: true })
 })
 
-Test('returns safe parse failures without throwing', T => {
+test('returns safe parse failures without throwing', () => {
 	const Result = Schema.Number().SafeParse(Number.NaN)
 
-	T.false(Result.Success)
+	expect(Result.Success).toBe(false)
 
 	if (!Result.Success) {
-		T.true(Result.Error instanceof SchemaError)
-		T.deepEqual(Result.Error.Issues[0], {
+		expect(Result.Error instanceof SchemaError).toBe(true)
+		expect(Result.Error.Issues[0]).toEqual({
 			Path: [],
 			Message: 'Expected number',
 			Expected: 'number',
@@ -25,13 +25,20 @@ Test('returns safe parse failures without throwing', T => {
 	}
 })
 
-Test('throws schema errors from parse', T => {
-	const CaughtError = T.throws(() => Schema.Boolean().Parse('no'), { instanceOf: SchemaError })
+test('throws schema errors from parse', () => {
+	let CaughtError: SchemaError | undefined
 
-	T.is(CaughtError?.Issues[0]?.Message, 'Expected boolean')
+	try {
+		Schema.Boolean().Parse('no')
+	} catch (Error) {
+		CaughtError = Error as SchemaError
+	}
+
+	expect(CaughtError).toBeInstanceOf(SchemaError)
+	expect(CaughtError?.Issues[0]?.Message).toBe('Expected boolean')
 })
 
-Test('parses objects and strips unknown keys', T => {
+test('parses objects and strips unknown keys', () => {
 	const UserSchema = Schema.Object({
 		id: Schema.String(),
 		meta: Schema.Object({
@@ -48,7 +55,7 @@ Test('parses objects and strips unknown keys', T => {
 		extra: 'ignored'
 	})
 
-	T.deepEqual(ParsedUser, {
+	expect(ParsedUser).toEqual({
 		id: 'u-1',
 		meta: {
 			active: true
@@ -57,7 +64,7 @@ Test('parses objects and strips unknown keys', T => {
 	})
 })
 
-Test('strict objects reject unknown keys', T => {
+test('strict objects reject unknown keys', () => {
 	const UserSchema = Schema.StrictObject({
 		id: Schema.String()
 	})
@@ -67,17 +74,17 @@ Test('strict objects reject unknown keys', T => {
 		extra: true
 	})
 
-	T.false(Result.Success)
+	expect(Result.Success).toBe(false)
 
 	if (!Result.Success) {
-		T.deepEqual(Result.Error.Issues, [{
+		expect(Result.Error.Issues).toEqual([{
 			Path: ['extra'],
 			Message: 'Unrecognized key "extra"'
 		}])
 	}
 })
 
-Test('strict object issues include nested unknown key paths', T => {
+test('strict object issues include nested unknown key paths', () => {
 	const UserSchema = Schema.StrictObject({
 		meta: Schema.StrictObject({
 			active: Schema.Boolean()
@@ -91,31 +98,31 @@ Test('strict object issues include nested unknown key paths', T => {
 		}
 	})
 
-	T.false(Result.Success)
+	expect(Result.Success).toBe(false)
 
 	if (!Result.Success) {
-		T.deepEqual(Result.Error.Issues[0], {
+		expect(Result.Error.Issues[0]).toEqual({
 			Path: ['meta', 'extra'],
 			Message: 'Unrecognized key "extra"'
 		})
 	}
 })
 
-Test('loose objects preserve unknown keys', T => {
+test('loose objects preserve unknown keys', () => {
 	const UserSchema = Schema.LooseObject({
 		id: Schema.String()
 	})
 
-	T.deepEqual(UserSchema.Parse({
+	expect(UserSchema.Parse({
 		id: 'u-1',
 		extra: true
-	}), {
+	})).toEqual({
 		id: 'u-1',
 		extra: true
 	})
 })
 
-Test('reports nested object and array paths', T => {
+test('reports nested object and array paths', () => {
 	const ConfigSchema = Schema.Object({
 		items: Schema.Array(Schema.Object({
 			label: Schema.String()
@@ -133,29 +140,29 @@ Test('reports nested object and array paths', T => {
 		]
 	})
 
-	T.false(Result.Success)
+	expect(Result.Success).toBe(false)
 
 	if (!Result.Success) {
-		T.deepEqual(Result.Error.Issues[0]?.Path, ['items', 1, 'label'])
-		T.is(Result.Error.Issues[0]?.Message, 'Expected string')
+		expect(Result.Error.Issues[0]?.Path).toEqual(['items', 1, 'label'])
+		expect(Result.Error.Issues[0]?.Message).toBe('Expected string')
 	}
 })
 
-Test('supports optional nullable and default modifiers', T => {
+test('supports optional nullable and default modifiers', () => {
 	const OptionsSchema = Schema.Object({
 		name: Schema.String().Optional(),
 		count: Schema.Number().Default(1),
 		note: Schema.String().Nullable()
 	})
 
-	T.deepEqual(OptionsSchema.Parse({ note: null }), {
+	expect(OptionsSchema.Parse({ note: null })).toEqual({
 		name: undefined,
 		count: 1,
 		note: null
 	})
 })
 
-Test('supports literal enum union and record schemas', T => {
+test('supports literal enum union and record schemas', () => {
 	const PreferenceSchema = Schema.Object({
 		mode: Schema.Union([
 			Schema.Literal('auto'),
@@ -164,13 +171,13 @@ Test('supports literal enum union and record schemas', T => {
 		weights: Schema.Record(Schema.Number())
 	})
 
-	T.deepEqual(PreferenceSchema.Parse({
+	expect(PreferenceSchema.Parse({
 		mode: 'dark',
 		weights: {
 			alpha: 1,
 			beta: 2
 		}
-	}), {
+	})).toEqual({
 		mode: 'dark',
 		weights: {
 			alpha: 1,
@@ -185,27 +192,27 @@ Test('supports literal enum union and record schemas', T => {
 		}
 	})
 
-	T.false(Result.Success)
+	expect(Result.Success).toBe(false)
 
 	if (!Result.Success) {
-		T.is(Result.Error.Issues[0]?.Message, 'Expected input to match one union member')
-		T.deepEqual(Result.Error.Issues[0]?.Path, ['mode'])
+		expect(Result.Error.Issues[0]?.Message).toBe('Expected input to match one union member')
+		expect(Result.Error.Issues[0]?.Path).toEqual(['mode'])
 	}
 })
 
-Test('supports refine and transform effects', T => {
+test('supports refine and transform effects', () => {
 	const PortSchema = Schema.Number()
 		.Refine(Value => Number.isInteger(Value), 'Expected integer')
 		.Refine(Value => Value > 0, 'Expected positive number')
 		.Transform(Value => `:${Value}`)
 
-	T.is(PortSchema.Parse(443), ':443')
+	expect(PortSchema.Parse(443)).toBe(':443')
 
 	const Result = PortSchema.SafeParse(-1)
 
-	T.false(Result.Success)
+	expect(Result.Success).toBe(false)
 
 	if (!Result.Success) {
-		T.is(Result.Error.Issues[0]?.Message, 'Expected positive number')
+		expect(Result.Error.Issues[0]?.Message).toBe('Expected positive number')
 	}
 })

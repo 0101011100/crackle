@@ -1,7 +1,7 @@
-import Test from 'ava'
+import { test, expect } from 'vitest'
 import { IsGFPSchedule, IsNaverWaterfall } from '@userscript/tunneled-schema.js'
 
-Test('IsGFPSchedule returns true for valid GFPSchedule', T => {
+test('IsGFPSchedule returns true for valid GFPSchedule', () => {
   const Sample = {
     'head': {
       'version': '0.0.1',
@@ -25,10 +25,10 @@ Test('IsGFPSchedule returns true for valid GFPSchedule', T => {
     ]
   }
   
-  T.assert(IsGFPSchedule(JSON.stringify(Sample)))
+  expect(IsGFPSchedule(JSON.stringify(Sample))).toBeTruthy()
 })
 
-Test('IsNaverWaterfall returns true for valid NaverWaterfall Preroll', T => {
+test('IsNaverWaterfall returns true for valid NaverWaterfall Preroll', () => {
   const Sample = {
     'requestId': '2ca52d7d5d8311a8612178ad3e59b215',
     'head': {
@@ -198,11 +198,11 @@ Test('IsNaverWaterfall returns true for valid NaverWaterfall Preroll', T => {
     ]
   }
 
-  T.assert(IsNaverWaterfall(JSON.stringify(Sample)))
+  expect(IsNaverWaterfall(JSON.stringify(Sample))).toBeTruthy()
 })
 
 
-Test('IsNaverWaterfall returns true for valid NaverWaterfall Midroll', T => {
+test('IsNaverWaterfall returns true for valid NaverWaterfall Midroll', () => {
   const SampleXML = '<?xml version="1.0" encoding="UTF-8"?>\n'
     + '<VAST version="3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="vast.xsd">\n'
     + '  <Ad id="3449225">\n'
@@ -411,5 +411,5 @@ Test('IsNaverWaterfall returns true for valid NaverWaterfall Midroll', T => {
     ]
   }
 
-  T.assert(IsNaverWaterfall(JSON.stringify(Sample)))
+  expect(IsNaverWaterfall(JSON.stringify(Sample))).toBeTruthy()
 })
