@@ -23,7 +23,8 @@ InstallXHRStatusMock(FakeXMLHttpRequest as unknown as typeof XMLHttpRequest, [{
 	Method: 'GET',
 	Url: /^https:\/\/api\.example\.test\/content\//,
 	Async: true,
-	Status: 200
+	Status: 200,
+	StatusText: 'OK'
 }], '')
 
 Test('mocks matched XHR status after headers are received', T => {
