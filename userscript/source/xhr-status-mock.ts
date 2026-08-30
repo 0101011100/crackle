@@ -3,10 +3,12 @@ export interface XHRStatusMockRule {
   readonly Url: string | RegExp
   readonly Async: boolean
   readonly Status: number
+  readonly StatusText: string
 }
 
 interface XHRStatusMockState {
   readonly Status?: number
+  readonly StatusText?: string
 }
 
 function MatchesUrl(UrlMatcher: string | RegExp, Url: string): boolean {
@@ -41,7 +43,7 @@ export function InstallXHRStatusMock(XMLHttpRequestConstructor: typeof XMLHttpRe
       let Async = Args[2] ?? true
       let Rule = FindStatusMockRule(Rules, Method, Url, Async)
 
-      States.set(ThisArg, Rule === undefined ? {} : { Status: Rule.Status })
+      States.set(ThisArg, Rule === undefined ? {} : { Status: Rule.Status, StatusText: Rule.StatusText })
       if (Rule?.Status) console.debug(`[${UserscriptName}] XHR open() called with method=${Method}, url=${Url}, async=${Async}. Matched rule: ${Rule === undefined ? 'none' : JSON.stringify(Rule)}`)
       return Reflect.apply(Target, ThisArg, Args)
     }
@@ -57,6 +59,19 @@ export function InstallXHRStatusMock(XMLHttpRequestConstructor: typeof XMLHttpRe
         return State.Status
       }
       return Reflect.apply(OriginalStatusGetter, ThisArg, []) as number
+    }
+  })
+
+  Object.defineProperty(XMLHttpRequestConstructor.prototype, 'statusText', {
+    configurable: true,
+    enumerable: true,
+    get: function GetStatusText(): string {
+      let ThisArg = this as XMLHttpRequest
+      let State = States.get(ThisArg)
+      if (State?.StatusText !== undefined && ThisArg.readyState >= XMLHttpRequestConstructor.HEADERS_RECEIVED) {
+        return State.StatusText
+      }
+      return Reflect.apply(OriginalStatusGetter, ThisArg, []) === 200 ? 'OK' : 'Error'
     }
   })
 }

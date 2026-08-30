@@ -78,7 +78,8 @@ const XHRStatusMockRules: readonly XHRStatusMockRule[] = [{
   Method: 'OPTIONS',
   Url: /^https:\/\/nam\.veta\.naver\.com\//,
   Async: true,
-  Status: 200
+  Status: 200,
+  StatusText: 'OK'
 }]
 InstallXHRStatusMock(Win.XMLHttpRequest, XHRStatusMockRules, UserscriptName)
 
