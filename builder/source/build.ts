@@ -1,6 +1,7 @@
 import * as ESBuild from 'esbuild'
 import PackageJson from '@npmcli/package-json'
 import { CreateBanner } from './banner/index.js'
+import { FetchEasyListGenericHideSelectors } from './EL-selectors.js'
 import { Build, type BuildOptions } from './build-core.js'
 
 export class StandardBuild extends Build {
@@ -33,6 +34,8 @@ export class StandardBuild extends Build {
       }
     })
 
+    const EasyListGenericHideSelectors = await FetchEasyListGenericHideSelectors()
+
     await ESBuild.build({
       entryPoints: [this.ProjectRoot + '/userscript/source/index.ts'],
       bundle: true,
@@ -41,7 +44,11 @@ export class StandardBuild extends Build {
       banner: {
         js: Banner
       },
-      target: ['es2024', 'chrome119', 'firefox142', 'safari26']
+      format: 'iife',
+      target: ['es2024', 'chrome119', 'firefox142', 'safari26'],
+      define: {
+        EASYLIST_GENERIC_HIDE_SELECTORS: JSON.stringify(EasyListGenericHideSelectors)
+      }
     })
   }
 }
