@@ -87,5 +87,9 @@ jobs:
         run: mkdir -p ~/.pnpm-store && pnpm config set store-dir ~/.pnpm-store
       - name: Install dependencies
         run: pnpm install --no-lockfile
+      - name: Print CPU model and memory
+        run: |
+          echo "CPU Model: $(lscpu | grep 'Model name' | awk -F ':' '{print $2}' | xargs)"
+          echo "Total Memory: $(free -h | grep 'Mem:' | awk '{print $2}')"
       - name: Run benchmarks
         run: pnpm run bench
