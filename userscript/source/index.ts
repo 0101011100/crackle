@@ -15,7 +15,7 @@ type unsafeWindow = typeof window
 declare const unsafeWindow: unsafeWindow
 
 // oxlint-disable-next-line crackle/pascal-case
-declare const EASYLIST_GENERIC_HIDE_SELECTORS: string
+declare const EASYLIST_GENERIC_HIDE_SELECTORS: string[]
 
 const Win = typeof unsafeWindow !== 'undefined' ? unsafeWindow : window
 const UserscriptName = 'Crackle'
@@ -23,6 +23,7 @@ const UserscriptName = 'Crackle'
 import { OriginalUint8Array } from './intrinsics.js'
 import { IsGFPSchedule, IsNaverWaterfall } from './tunneled-schema.js'
 import { GFPScheduleBlock, NaverWaterfallBlock } from './resource.js'
+import { InstallXHRStatusMock, type XHRStatusMockRule } from './xhr-status-mock.js'
 export { OriginalUint8Array }
 
 Win.Uint8Array = new Proxy(Win.Uint8Array, {
@@ -52,12 +53,11 @@ Win.Uint8Array = new Proxy(Win.Uint8Array, {
 
 // CSS Style Properties Monkeying
 const MonkeyedHTMLElement: WeakMap<CSSStyleProperties, boolean> = new WeakMap()
-const ELGenericHideSelectors: string[] = JSON.parse(EASYLIST_GENERIC_HIDE_SELECTORS) as string[]
 
 Win.getComputedStyle = new Proxy(Win.getComputedStyle, {
   apply(Target: typeof getComputedStyle, ThisArg: undefined, Args: Parameters<typeof getComputedStyle>) {
     const Result = Reflect.apply(Target, ThisArg, Args)
-    if (Args[0] instanceof HTMLElement && ELGenericHideSelectors.some(Selector => Args[0].classList.contains(Selector))) {
+    if (Args[0] instanceof HTMLElement && EASYLIST_GENERIC_HIDE_SELECTORS.some(Selector => Args[0].classList.contains(Selector))) {
       MonkeyedHTMLElement.set(Result, true)
     } else MonkeyedHTMLElement.set(Result, false)
     return Result
@@ -72,5 +72,13 @@ Win.CSSStyleProperties.prototype.getPropertyValue = new Proxy(Win.CSSStyleProper
     return Reflect.apply(Target, ThisArg, Args)
   }
 })
+
+const XHRStatusMockRules: readonly XHRStatusMockRule[] = [{
+  Method: 'OPTIONS',
+  Url: /^https:\/\/nam\.veta\.naver\.com\//,
+  Async: true,
+  Status: 200
+}]
+InstallXHRStatusMock(Win.XMLHttpRequest, XHRStatusMockRules, UserscriptName)
 
 // BUILD:END
