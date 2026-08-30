@@ -4,6 +4,14 @@
 
 치지직이 사용하는 GFP Video Ad Schedule 및 Naver SSP Waterfall 광고 응답을 인식해 광고가 없는 응답으로 대체합니다. 지원하지 않는 형식의 응답은 변경하지 않습니다.
 
+
+> [!IMPORTANT]
+> tinyShield 유저스크립트 유지보수자는 tinyShield 유저스크립트와 함께 아래 애드블록들 중 하나를 사용하실 것을 권장합니다:
+> - AdGuard
+> - uBlock Origin
+>
+> 다른 애드블록 지원은 보장되지 않고 요청되어도 거부될 수 있습니다.
+
 ## Discord/Telegram로 업데이트 알림 받기
 
 [Discord 봇](https://discord.com/oauth2/authorize?client_id=1543001264776814723) 또는 Telegram `@filteringdev_noti_bot`을 통해 업데이트 알림을 받을 수 있습니다.
