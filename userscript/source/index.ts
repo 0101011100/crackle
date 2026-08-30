@@ -64,8 +64,8 @@ Win.getComputedStyle = new Proxy(Win.getComputedStyle, {
   }
 })
 
-Win.CSSStyleProperties.prototype.getPropertyValue = new Proxy(Win.CSSStyleProperties.prototype.getPropertyValue, {
-  apply(Target: typeof Win.CSSStyleProperties.prototype.getPropertyValue, ThisArg: CSSStyleDeclaration, Args: Parameters<typeof Win.CSSStyleProperties.prototype.getPropertyValue>) {
+Win.CSSStyleDeclaration.prototype.getPropertyValue = new Proxy(Win.CSSStyleDeclaration.prototype.getPropertyValue, {
+  apply(Target: typeof Win.CSSStyleDeclaration.prototype.getPropertyValue, ThisArg: CSSStyleDeclaration, Args: Parameters<typeof Win.CSSStyleDeclaration.prototype.getPropertyValue>) {
     if (typeof Args[0] === 'string' && Args[0] === 'display' && MonkeyedHTMLElement.get(ThisArg)) {
       console.debug(`[${UserscriptName}] getPropertyValue('display') called on a monkeyed HTMLElement. Returning 'block' instead of the native value.`)
       return 'block'
