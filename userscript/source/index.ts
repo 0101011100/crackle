@@ -43,6 +43,15 @@ Win.Uint8Array = new Proxy(Win.Uint8Array, {
           console.debug(`[${UserscriptName}] Replaced Naver Waterfall with a mock block`)
           // oxlint-disable-next-line typescript/no-unsafe-return 
           return Reflect.construct(Target, [Msg])
+        case TextDecoderInstance.includes('"dab"'): {
+          const Json = JSON.parse(TextDecoderInstance)
+          if (Json?.content?.dab) {
+            Json.content.dab = false
+            Msg = new TextEncoder().encode(JSON.stringify(Json))
+            return Reflect.construct(Target, [Msg])
+          }
+          return Reflect.construct(Target, Args)
+        }
         default:
           return Reflect.construct(Target, Args)
       }
@@ -74,6 +83,31 @@ Win.CSSStyleDeclaration.prototype.getPropertyValue = new Proxy(Win.CSSStyleDecla
     return Reflect.apply(Target, ThisArg, Args)
   }
 })
+
+// Inject dab: false on core API endpoints
+const OriginalFetch = Win.fetch
+if (typeof OriginalFetch === 'function') {
+  Win.fetch = async function (...Args: Parameters<typeof fetch>) {
+    const ResponseInstance = await Reflect.apply(OriginalFetch, this, Args)
+    const RequestUrl = Args[0] instanceof Request ? Args[0].url : String(Args[0] ?? '')
+
+    if (RequestUrl && (RequestUrl.includes('/live-detail') || RequestUrl.includes('/live-status') || RequestUrl.includes('/videos/') || RequestUrl.includes('/clips/'))) {
+      try {
+        const ClonedResponse = ResponseInstance.clone()
+        const JsonData = await ClonedResponse.json()
+        if (JsonData?.content && JsonData.content.dab !== undefined) {
+          JsonData.content.dab = false
+          return new Response(JSON.stringify(JsonData), {
+            status: ResponseInstance.status,
+            statusText: ResponseInstance.statusText,
+            headers: ResponseInstance.headers
+          })
+        }
+      } catch { }
+    }
+    return ResponseInstance
+  }
+}
 
 const XHRStatusMockRules: readonly XHRStatusMockRule[] = [{
   Method: 'OPTIONS',
