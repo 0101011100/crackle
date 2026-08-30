@@ -43,6 +43,15 @@ Win.Uint8Array = new Proxy(Win.Uint8Array, {
           console.debug(`[${UserscriptName}] Replaced Naver Waterfall with a mock block`)
           // oxlint-disable-next-line typescript/no-unsafe-return 
           return Reflect.construct(Target, [Msg])
+        case TextDecoderInstance.includes('"dab"'): {
+          const Json = JSON.parse(TextDecoderInstance)
+          if (Json?.content?.dab) {
+            Json.content.dab = false
+            Msg = new TextEncoder().encode(JSON.stringify(Json))
+            return Reflect.construct(Target, [Msg])
+          }
+          return Reflect.construct(Target, Args)
+        }
         default:
           return Reflect.construct(Target, Args)
       }
@@ -74,6 +83,60 @@ Win.CSSStyleDeclaration.prototype.getPropertyValue = new Proxy(Win.CSSStyleDecla
     return Reflect.apply(Target, ThisArg, Args)
   }
 })
+
+function NormalizeMediaPayload(Data: unknown): unknown {
+  if (typeof Data === 'string' && Data.includes('"dab"')) {
+    try {
+      const Json = JSON.parse(Data)
+      if (Json?.content?.dab) {
+        Json.content.dab = false
+        return JSON.stringify(Json)
+      }
+    } catch { }
+  } else if (Data && typeof Data === 'object' && (Data as { content?: { dab?: boolean } })?.content?.dab) {
+    (Data as { content: { dab: boolean } }).content.dab = false
+  }
+  return Data
+}
+
+const OriginalFetch = Win.fetch
+if (typeof OriginalFetch === 'function') {
+  Win.fetch = async function (...Args: Parameters<typeof fetch>) {
+    const Res = await Reflect.apply(OriginalFetch, this, Args)
+    const Url = Args[0] instanceof Request ? Args[0].url : String(Args[0] ?? '')
+    if (Url && (Url.includes('/live-detail') || Url.includes('/videos/'))) {
+      try {
+        const Body = NormalizeMediaPayload(await Res.clone().text()) as string
+        return new Response(Body, { status: Res.status, statusText: Res.statusText, headers: Res.headers })
+      } catch { }
+    }
+    return Res
+  }
+}
+
+const TargetXHR: WeakSet<XMLHttpRequest> = new WeakSet()
+const OrigXHROpen = Win.XMLHttpRequest.prototype.open
+Win.XMLHttpRequest.prototype.open = new Proxy(OrigXHROpen, {
+  apply(Target: typeof Win.XMLHttpRequest.prototype.open, ThisArg: XMLHttpRequest, Args: Parameters<typeof Win.XMLHttpRequest.prototype.open>) {
+    const Url = String(Args[1] ?? '')
+    if (Url.includes('/live-detail') || Url.includes('/videos/')) TargetXHR.add(ThisArg)
+    return Reflect.apply(Target, ThisArg, Args)
+  }
+})
+
+for (const Prop of ['responseText', 'response'] as const) {
+  const Getter = Object.getOwnPropertyDescriptor(Win.XMLHttpRequest.prototype, Prop)?.get
+  if (Getter) {
+    Object.defineProperty(Win.XMLHttpRequest.prototype, Prop, {
+      configurable: true,
+      enumerable: true,
+      get(this: XMLHttpRequest) {
+        const Val = Reflect.apply(Getter, this, [])
+        return TargetXHR.has(this) ? NormalizeMediaPayload(Val) : Val
+      }
+    })
+  }
+}
 
 const XHRStatusMockRules: readonly XHRStatusMockRule[] = [{
   Method: 'OPTIONS',
