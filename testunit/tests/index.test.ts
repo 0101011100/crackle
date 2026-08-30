@@ -1,6 +1,4 @@
-import Test from 'ava'
+import { test } from 'vitest'
 
 // TODO: replace with real tests once crackle userscript logic is implemented
-Test('placeholder', T => {
-  T.pass()
-})
+test('placeholder', () => {})

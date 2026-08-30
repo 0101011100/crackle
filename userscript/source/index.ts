@@ -21,6 +21,7 @@ import { OriginalUint8Array } from './intrinsics.js'
 import { IsGFPSchedule, IsNaverWaterfall } from './tunneled-schema.js'
 import { GFPScheduleBlock, NaverWaterfallBlock } from './resource.js'
 import { InstallXHRStatusMock, type XHRStatusMockRule } from './xhr-status-mock.js'
+import { UnionArrays } from './arrrayext.js'
 export { OriginalUint8Array }
 
 if (Win.crypto?.subtle?.decrypt) {

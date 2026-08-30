@@ -7,6 +7,7 @@
     "build": "pnpm --filter @filteringdev/crackle-builder run build --minify true --build-type production --SubscriptionUrl https://cdn.jsdelivr.net/npm/@filteringdev/crackle@latest/dist/crackle.user.js",
     "debug": "pnpm --filter @filteringdev/crackle-builder run debug",
     "lint": "pnpm --filter @filteringdev/crackle-builder run lint && pnpm --filter @filteringdev/crackle-userscript run lint && pnpm --filter @filteringdev/crackle-testunit run lint",
+	"bench": "pnpm --filter @filteringdev/crackle-testunit run bench",
     "test": "pnpm --filter @filteringdev/crackle-testunit run test"
   },
   "keywords": [],
