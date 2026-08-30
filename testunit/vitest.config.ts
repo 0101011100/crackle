@@ -3,9 +3,16 @@ import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
 	resolve: {
-		alias: {
-			'@userscript/': fileURLToPath(new URL('../userscript/source/', import.meta.url))
-		}
+		alias: [
+			{
+				find: /^@userscript\/(.*)\.js$/,
+				replacement: fileURLToPath(new URL('../userscript/source/$1.ts', import.meta.url))
+			},
+			{
+				find: /^@userscript\/(.*)$/,
+				replacement: fileURLToPath(new URL('../userscript/source/$1', import.meta.url))
+			}
+		]
 	},
 	test: {
 		include: ['tests/**/*.test.ts']
