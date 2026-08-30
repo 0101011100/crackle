@@ -24,6 +24,7 @@ import { OriginalUint8Array } from './intrinsics.js'
 import { IsGFPSchedule, IsNaverWaterfall } from './tunneled-schema.js'
 import { GFPScheduleBlock, NaverWaterfallBlock } from './resource.js'
 import { InstallXHRStatusMock, type XHRStatusMockRule } from './xhr-status-mock.js'
+import { UnionArrays } from './arrrayext.js'
 export { OriginalUint8Array }
 
 Win.Uint8Array = new Proxy(Win.Uint8Array, {
@@ -57,7 +58,7 @@ const MonkeyedHTMLElement: WeakMap<CSSStyleProperties, boolean> = new WeakMap()
 Win.getComputedStyle = new Proxy(Win.getComputedStyle, {
   apply(Target: typeof getComputedStyle, ThisArg: undefined, Args: Parameters<typeof getComputedStyle>) {
     const Result = Reflect.apply(Target, ThisArg, Args)
-    if (Args[0] instanceof HTMLElement && EASYLIST_GENERIC_HIDE_SELECTORS.some(Selector => Args[0].classList.contains(Selector))) {
+    if (Args[0] instanceof HTMLElement && UnionArrays(EASYLIST_GENERIC_HIDE_SELECTORS, [...Args[0].classList]).length > 0) {
       MonkeyedHTMLElement.set(Result, true)
     } else MonkeyedHTMLElement.set(Result, false)
     return Result
