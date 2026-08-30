@@ -50,7 +50,7 @@ jobs:
       - name: Build the project
         run: pnpm run build
   test:
-    name: Run ava tests
+    name: Run vitest tests
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -68,4 +68,24 @@ jobs:
       - name: Install dependencies
         run: pnpm install --no-lockfile
       - name: Run tests
-        run: npm run test
+        run: pnpm run test
+  bench:
+    name: Run vitest benchmarks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Set up NodeJS LTS
+        uses: actions/setup-node@v7
+        with:
+          node-version: 'lts/*'
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Install pnpm
+        run: npm install -g pnpm
+      - name: Set pnpm store-dir path
+        run: mkdir -p ~/.pnpm-store && pnpm config set store-dir ~/.pnpm-store
+      - name: Install dependencies
+        run: pnpm install --no-lockfile
+      - name: Run benchmarks
+        run: pnpm run bench
