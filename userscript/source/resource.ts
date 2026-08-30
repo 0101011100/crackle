@@ -94,6 +94,12 @@ export function NaverWaterfallBlock() {
     'adDivId': 'live_player_layout',
     'videoSkipMin': 5,
     'videoSkipAfter': 5,
-    'ads': []
-    }
+    'ads': [
+      {
+        'encrypted': GenerateHex(32),
+        'adProviderName': 'GFP',
+        'renderType': 'EMPTY'
+      }
+    ]
+  }
 }

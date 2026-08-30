@@ -21,11 +21,11 @@ export class StandardBuild extends Build {
       BuildType: this.Options!.BuildType ?? 'production',
       Domains: new Set<string>(['chzzk.naver.com']),
       Name: 'crackle',
-      Namespace: 'https://github.com/FilteringDev/crackle',
+      Namespace: 'https://github.com/0101011100/crackle',
       DownloadURL: this.Options!.SubscriptionUrl,
       UpdateURL: this.Options!.SubscriptionUrl,
-      HomepageURL: new URL('https://github.com/FilteringDev/crackle'),
-      SupportURL: new URL('https://github.com/FilteringDev/crackle/issues'),
+      HomepageURL: new URL('https://github.com/0101011100/crackle'),
+      SupportURL: new URL('https://github.com/0101011100/crackle/issues'),
       License: 'MPL-2.0',
       Author: 'PiQuark6046 and contributors',
       Description: {
@@ -33,8 +33,6 @@ export class StandardBuild extends Build {
         ko: '네이버 치지직 웹 사이트에 대한 광고 제거 및 안티-애드블록 우회 스크립트'
       }
     })
-
-    const EasyListGenericHideSelectors = await FetchEasyListGenericHideSelectors()
 
     await ESBuild.build({
       entryPoints: [this.ProjectRoot + '/userscript/source/index.ts'],
@@ -45,10 +43,7 @@ export class StandardBuild extends Build {
         js: Banner
       },
       format: 'iife',
-      target: ['es2024', 'chrome119', 'firefox142', 'safari26'],
-      define: {
-        EASYLIST_GENERIC_HIDE_SELECTORS: JSON.stringify(EasyListGenericHideSelectors)
-      }
+      target: ['es2024', 'chrome119', 'firefox142', 'safari26']
     })
   }
 }

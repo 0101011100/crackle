@@ -11,19 +11,23 @@ export type SafeParseResult<Value> =
 	| {
 			readonly Success: true
 			readonly Data: Value
+			readonly Error?: never
 	  }
 	| {
 			readonly Success: false
+			readonly Data?: never
 			readonly Error: SchemaError
 	  }
 
 type ParseSuccess<Value> = {
 	readonly Success: true
 	readonly Data: Value
+	readonly Issues?: never
 }
 
 type ParseFailure = {
 	readonly Success: false
+	readonly Data?: never
 	readonly Issues: SchemaIssue[]
 }
 
@@ -131,11 +135,14 @@ export class SchemaDefinition<Value> {
 	}
 
 	Transform<NextValue>(Mapper: (Value: Value) => NextValue): SchemaDefinition<NextValue> {
-		return new SchemaDefinition((Input, Path) => {
+		return new SchemaDefinition<NextValue>((Input, Path) => {
 			const Result = this.ParseAt(Input, Path)
 
 			if (!Result.Success) {
-				return Result
+				return {
+					Success: false,
+					Issues: Result.Issues
+				}
 			}
 
 			return Succeed(Mapper(Result.Data))
