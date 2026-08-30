@@ -4,6 +4,11 @@
 
 치지직이 사용하는 GFP Video Ad Schedule 및 Naver SSP Waterfall 광고 응답을 인식해 광고가 없는 응답으로 대체합니다. 지원하지 않는 형식의 응답은 변경하지 않습니다.
 
+## Discord/Telegram로 업데이트 알림 받기
+
+[Discord 봇](https://discord.com/oauth2/authorize?client_id=1543001264776814723) 또는 Telegram `@filteringdev_noti_bot`을 통해 업데이트 알림을 받을 수 있습니다.
+
+
 ## 설치
 
 유저스크립트 매니저가 필요합니다. 아래 지원 방법 중 하나를 선택해 설치하세요.
